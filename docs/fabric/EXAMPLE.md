@@ -43,8 +43,8 @@
 {
   "ordererOrgs": [
     {
-      "name": "Org0Orderer",
-      "domain": "orderer.org0.example.com",
+      "name": "Orderer",
+      "domain": "example.com",
       "enableNodeOUs": true,
       "hostname": [
         "orderer0",
@@ -127,23 +127,23 @@ bdk fabric network create -f ~/.bdk/network-create.json --create-full
 
 ```bash
 # 啟動 orderer 的機器
-bdk fabric orderer up -n orderer0.example.com -n orderer1.example.com
-
+bdk fabric orderer up -i
 # 啟動 peer 的機器
-bdk fabric peer up -n peer0.org1.example.com -n peer1.org1.example.com -n peer0.org2.example.com
-```
+bdk fabric peer up -i```
 
 ### Step 3：建立 Channel
 
 首先更改在 *~/.bdk/.env* 組織的名稱 *BDK_ORG_NAME* 與 Domain 名稱 *BDK_ORG_DOMAIN* 設定，再來建立一個名稱為 *test* 的 [Application Channel](https://hyperledger-fabric.readthedocs.io/en/release-2.2/create_channel/create_channel_overview.html?highlight=channel)，為了讓之後加入新的 Peer 組織加入只需要一個組織同意即可，我們將 Channel admin policy 設定為只需要任何在 Channel 中的成員簽名即可，使用 `--channelAdminPolicyStyle` 設定成 `Any-Member-in-Channel` ，改變 Application Channel 中的 Channel Admin Policy
 
 ```bash
-# export BDK_ORG_NAME='Org1'
-# export BDK_ORG_DOMAIN='org1.example.com'
-# export BDK_HOSTNAME='peer0'
-
+#更改bdk環境變數
+# bdk fabric config set --key BDK_ORG_NAME --value Org0
+# bdk fabric config set --key BDK_ORG_DOMAIN --value org0.example.com
+# bdk fabric config set --key BDK_HOSTNAME --value peer0
+#檢查環境變數有無更改成功
+# bdk fabric config ls 
 # Org1 的 peer0 建立新的 channel
-bdk fabric channel create -n test --orderer orderer0.example.com:7050 -o Or1 -o Org2 --channelAdminPolicyStyle "Any-Member-in-Channel"
+bdk fabric channel create -i"
 ```
 
 ### Step 4：Org1 和 Org2 加入 Channel
@@ -158,16 +158,16 @@ Org1 和 Org2 加入名稱為 *test* 的 Application Channel，由於加入 Appl
 # Org1 的 peer0 加入 channel
 bdk fabric channel join -n test --orderer orderer0.example:7050
 
-# export BDK_ORG_NAME='Org1'
-# export BDK_ORG_DOMAIN='org1.example.com'
-# export BDK_HOSTNAME='peer1'
+# bdk fabric config set --key BDK_ORG_NAME --value Org0
+# bdk fabric config set --key BDK_ORG_DOMAIN --value org0.example.com
+# bdk fabric config set --key BDK_HOSTNAME --value peer1
 
 # Org1 的 peer1 加入 channel
 bdk fabric channel join -n test --orderer orderer0.example:7050
 
-# export BDK_ORG_NAME='Org2'
-# export BDK_ORG_DOMAIN='org2.example.com'
-# export BDK_HOSTNAME='peer0'
+# bdk fabric config set --key BDK_ORG_NAME --value Org1
+# bdk fabric config set --key BDK_ORG_DOMAIN --value org1.example.com
+# bdk fabric config set --key BDK_HOSTNAME --value peer0
 
 # Org2 的 peer0 加入 channel
 bdk fabric channel join -n test --orderer orderer0.example.com:7050
